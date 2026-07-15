@@ -26,17 +26,15 @@
   non-owners can't open, edit, or share a document they haven't been given
   access to
 
+## Live Deployment
+
+- **Live Product URL**: [https://scribe-docs-editor.netlify.app/](https://scribe-docs-editor.netlify.app/)
+- **Backend API URL**: Deployed on Render's Web Service (Free Tier)
+
 ## Outstanding — needs action from the candidate before final submission
 
 These require accounts/services outside this build environment and were
 intentionally left for the candidate to complete:
-
-- [ ] **Live deployment URL.** The app is fully build-tested locally
-      (`npm run build` succeeds, both servers verified against each other)
-      but has not been deployed to a hosting provider. See "Production
-      build" in `README.md` for the recommended path (Render/Railway/
-      Fly.io for the backend's SQLite file; any static host for the
-      frontend build output).
 - [ ] **Walkthrough video (3–5 min).** Not recorded. Suggested outline:
       demo flow → creating a doc → uploading a `.docx`/`.md` → sharing with
       a second seeded account and switching to it → what was deprioritized
