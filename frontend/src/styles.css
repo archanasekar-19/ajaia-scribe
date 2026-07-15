@@ -1043,6 +1043,9 @@ select:focus-visible,
   line-height: 1.8;
   color: var(--text-main);
 }
+.editor-surface * {
+  font-family: inherit;
+}
 
 .editor-surface.font-serif {
   font-family: var(--font-serif);
