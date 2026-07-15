@@ -72,11 +72,16 @@ export default function Editor() {
   const [showShare, setShowShare] = useState(false);
 
   const titleRef = useRef("");
+  const fontFamilyRef = useRef("");
 
-  // Sync titleRef with state
+  // Sync titleRef and fontFamilyRef with state
   useEffect(() => {
     titleRef.current = title;
   }, [title]);
+
+  useEffect(() => {
+    fontFamilyRef.current = fontFamily;
+  }, [fontFamily]);
 
   // Custom states
   const savedFont = localStorage.getItem("editor-font");
@@ -105,6 +110,9 @@ export default function Editor() {
         if (cancelled) return;
         setDoc(data);
         setTitle(data.title);
+        if (data.fontFamily) {
+          setFontFamily(data.fontFamily);
+        }
       })
       .catch((err) => setError(err.message));
     return () => {
@@ -143,6 +151,11 @@ export default function Editor() {
         const trimmedTitle = titleRef.current.trim();
         if (trimmedTitle && trimmedTitle !== doc.title) {
           patch.title = trimmedTitle;
+          hasChanges = true;
+        }
+
+        if (fontFamilyRef.current && fontFamilyRef.current !== doc.fontFamily) {
+          patch.fontFamily = fontFamilyRef.current;
           hasChanges = true;
         }
 
@@ -281,6 +294,9 @@ export default function Editor() {
     const f = e.target.value;
     setFontFamily(f);
     localStorage.setItem("editor-font", f);
+    if (!readOnly) {
+      scheduleSave({ fontFamily: f });
+    }
   };
 
   if (error && !doc) {

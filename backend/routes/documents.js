@@ -13,6 +13,7 @@ function serializeDocument(doc, currentUserId) {
     id: doc.id,
     title: doc.title,
     content: doc.content,
+    fontFamily: doc.font_family,
     ownerId: doc.owner_id,
     ownerName: doc.owner_name,
     isOwner: doc.owner_id === currentUserId,
@@ -101,10 +102,11 @@ router.get("/:id", (req, res) => {
 router.post("/", (req, res) => {
   const title = (req.body.title || "Untitled document").toString().slice(0, 200).trim() || "Untitled document";
   const content = typeof req.body.content === "string" ? req.body.content : "";
+  const fontFamily = typeof req.body.fontFamily === "string" ? req.body.fontFamily : "'Open Sans', sans-serif";
 
   const info = db
-    .prepare("INSERT INTO documents (title, content, owner_id) VALUES (?, ?, ?)")
-    .run(title, content, req.user.id);
+    .prepare("INSERT INTO documents (title, content, font_family, owner_id) VALUES (?, ?, ?, ?)")
+    .run(title, content, fontFamily, req.user.id);
 
   const doc = db
     .prepare(
@@ -121,7 +123,7 @@ router.patch("/:id", (req, res) => {
   const result = loadAccessibleDoc(req, res, { requireEdit: true });
   if (!result) return;
 
-  const { title, content } = req.body;
+  const { title, content, fontFamily } = req.body;
 
   if (title !== undefined) {
     const trimmed = title.toString().slice(0, 200).trim();
@@ -140,6 +142,16 @@ router.patch("/:id", (req, res) => {
     }
     db.prepare("UPDATE documents SET content = ?, updated_at = datetime('now') WHERE id = ?").run(
       content,
+      result.doc.id
+    );
+  }
+
+  if (fontFamily !== undefined) {
+    if (typeof fontFamily !== "string") {
+      return res.status(400).json({ error: "fontFamily must be a string." });
+    }
+    db.prepare("UPDATE documents SET font_family = ?, updated_at = datetime('now') WHERE id = ?").run(
+      fontFamily,
       result.doc.id
     );
   }

@@ -35,6 +35,13 @@ db.exec(`
   );
 `);
 
+// Migration: Add font_family column to documents table if not present
+try {
+  db.exec("ALTER TABLE documents ADD COLUMN font_family TEXT NOT NULL DEFAULT '\"Open Sans\", sans-serif'");
+} catch (e) {
+  // Column already exists, ignore
+}
+
 // Seed demo users if the table is empty. These are the "mocked auth"
 // accounts referenced in the README - pick one from a dropdown, no password.
 const userCount = db.prepare("SELECT COUNT(*) AS c FROM users").get().c;
