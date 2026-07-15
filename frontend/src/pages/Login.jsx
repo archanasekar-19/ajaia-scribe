@@ -2,35 +2,20 @@ import React from "react";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../App.jsx";
 
-const QuillLogo = () => (
+const ScribeLogo = () => (
   <svg
-    viewBox="0 0 64 64"
+    xmlns="http://www.w3.org/2000/svg"
+    aria-hidden="true"
+    role="img"
     className="brand-mark-svg"
-    strokeWidth="4.5"
-    stroke="currentColor"
-    fill="none"
-    strokeLinecap="round"
-    strokeLinejoin="round"
+    viewBox="0 0 36 36"
     style={{ color: "var(--accent)", width: "36px", height: "36px" }}
   >
-    {/* Left loop leaf */}
-    <path d="M12 46c-7 0-5-16 1-20c6-4 10 10 2 10c-6 0-8 12 10 14" />
-    
-    {/* Right sprig stem */}
-    <path d="M38 50c1-8 4-18 5-26" />
-    
-    {/* Top lobe */}
-    <path d="M43 24c-2-8 6-8 6 0c0 4-4 6-6 6" />
-    
-    {/* Left lobes */}
-    <path d="M42 30c-6-4-6 4 0 6" />
-    <path d="M41 38c-6-4-6 4 0 6" />
-    <path d="M40 46c-6-4-6 4 0 6" />
-    
-    {/* Right lobes */}
-    <path d="M43 27c6-4 6 4 0 6" />
-    <path d="M42 35c6-4 6 4 0 6" />
-    <path d="M41 43c6-4 6 4 0 6" />
+    <path
+      fill="currentColor"
+      d="M17 33.9c-3.9 0-7.9-1.5-10.5-4.5c-.9.7-2 1.3-3.1 1.8c-.5.2-1.1 0-1.3-.5s0-1.1.5-1.3q1.5-.6 2.7-1.5c-1.2-1.9-1.9-4.3-1.9-7.1c0-5.3 2.5-8.1 4.8-8.1c1.5 0 3.2 1.2 3.2 4.7c0 4.7-1.1 8.2-3.5 10.8c2.2 2.6 5.6 3.9 9 3.9c.6 0 1 .4 1 1s-.3.8-.9.8M8.2 14.6c-1 0-2.8 1.8-2.8 6.1c0 2.2.5 4.1 1.4 5.6c1.8-2.1 2.7-5.1 2.7-9.1c0-1.5-.5-2.6-1.3-2.6m25.1-9.8c-.8-1.4-2.1-2.4-3.6-2.8c-.5-.1-1.1.2-1.2.7l-.9 3.4L26 3.3c-.1-.2-.4-.4-.7-.5s-.6 0-.8.2c-1.1.8-1.8 1.9-2.2 3.2l-4.2 15.4c-.4 1.5-.2 3.2.6 4.6c.6 1.1 1.6 1.9 2.7 2.5l-1.1 4c-.1.5.2 1.1.7 1.2h.3c.4 0 .8-.3 1-.7l1.1-3.9h.6c1 0 2-.3 3-.8c1.4-.8 2.4-2.1 2.8-3.6l1.6-5.8l1.6-5.8c.1-.4 0-.8-.4-1.1c-.3-.2-.8-.3-1.1-.1l-4 2.3l.6-2.1l5.7-3.2c.3-.2.5-.5.5-.8c-.1-1.2-.4-2.4-1-3.5m-9.1 2c.1-.5.3-.9.6-1.3l1.9 3.4l-1.4 5.1l-2.1-3.7zm-3.8 18.4c-.5-.9-.7-2-.4-3l2.5-9.2l2.1 3.7l-1.4 5.3l-1.3 4.7q-.9-.45-1.5-1.5m7.3-.9c-.3 1-.9 1.9-1.9 2.4c-.6.4-1.3.5-2 .5L25 23l3.7-2.1zm2.6-9.2l-.8 3.1l-3.7 2.1l.8-3.1zm-1.7-5.5l.1-.4c.1-.1.1-.3.1-.4L30 4.3c.6.3 1.1.9 1.5 1.5c.3.6.5 1.2.5 1.8z"
+    />
+    <path fill="none" d="M0 0h36v36H0z" />
   </svg>
 );
 
@@ -43,8 +28,8 @@ export default function Login() {
     <div className="auth-screen">
       <div className="auth-card">
         <div className="brand">
-          <QuillLogo />
-          <span className="brand-name">Ajaia Scribe</span>
+          <ScribeLogo />
+          <span className="brand-name">Scribe</span>
         </div>
         <h1>Pick a workspace account</h1>
         <p className="muted">
@@ -61,6 +46,9 @@ export default function Login() {
                 <span className="user-name">{u.name}</span>
                 <span className="user-email">{u.email}</span>
               </span>
+              <svg viewBox="0 0 24 24" className="login-chevron" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
             </button>
           ))}
         </div>

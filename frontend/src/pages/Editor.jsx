@@ -63,6 +63,7 @@ export default function Editor() {
   const navigate = useNavigate();
   const editorRef = useRef(null);
   const saveTimer = useRef(null);
+  const isInitializedRef = useRef(false);
 
   const [doc, setDoc] = useState(null);
   const [title, setTitle] = useState("");
@@ -71,7 +72,9 @@ export default function Editor() {
   const [showShare, setShowShare] = useState(false);
   
   // Custom states
-  const [fontFamily, setFontFamily] = useState(localStorage.getItem("editor-font") || "serif");
+  const savedFont = localStorage.getItem("editor-font");
+  const defaultFont = savedFont && (savedFont.includes(",") || savedFont.includes(" ")) ? savedFont : "'Open Sans', sans-serif";
+  const [fontFamily, setFontFamily] = useState(defaultFont);
   const [zenMode, setZenMode] = useState(false);
   const [stats, setStats] = useState({ words: 0, chars: 0, readTime: 0 });
 
@@ -87,23 +90,62 @@ export default function Editor() {
 
   useEffect(() => {
     let cancelled = false;
+    setDoc(null);
+    isInitializedRef.current = false;
     api
       .getDocument(id, currentUser.id)
       .then((data) => {
         if (cancelled) return;
         setDoc(data);
         setTitle(data.title);
-        if (editorRef.current) {
-          editorRef.current.innerHTML = data.content || "<p></p>";
-          updateStats();
-        }
       })
       .catch((err) => setError(err.message));
     return () => {
       cancelled = true;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]);
+  }, [id, currentUser.id]);
+
+  const setEditorRef = useCallback((el) => {
+    editorRef.current = el;
+    if (el && doc && !isInitializedRef.current) {
+      el.innerHTML = doc.content || "<p></p>";
+      // Inline stats update
+      const text = el.innerText || "";
+      const chars = text.length;
+      const words = text.trim().split(/\s+/).filter(Boolean).length;
+      const readTime = Math.ceil(words / 200);
+      setStats({ words, chars, readTime });
+      isInitializedRef.current = true;
+    }
+  }, [doc]);
+
+  // Save immediately on unmount if timer is active
+  useEffect(() => {
+    return () => {
+      if (saveTimer.current) {
+        clearTimeout(saveTimer.current);
+        if (editorRef.current && doc && doc.permission !== "view") {
+          const content = editorRef.current.innerHTML;
+          api.updateDocument(id, currentUser.id, { content }).catch(() => {});
+        }
+      }
+    };
+  }, [id, currentUser.id, doc]);
+
+  // Prompt user if unloading while save is pending
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      if (saveState === "saving") {
+        e.preventDefault();
+        e.returnValue = "Changes you made may not be saved.";
+        return e.returnValue;
+      }
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [saveState]);
 
   const readOnly = doc && doc.permission === "view";
 
@@ -232,17 +274,21 @@ export default function Editor() {
   return (
     <div className={`app-shell ${zenMode ? "zen-mode" : ""}`}>
       <header className="top-bar">
-        <button className="secondary-button" onClick={() => navigate("/")} style={{ padding: "6px 12px" }}>
-          ← Documents
-        </button>
-        <input
-          className="title-input"
-          value={title}
-          onChange={handleTitleChange}
-          onBlur={handleTitleBlur}
-          disabled={readOnly}
-          title={readOnly ? "View only" : "Rename document"}
-        />
+        <div style={{ display: "flex", alignItems: "center", gap: "12px", flex: 1 }}>
+          <button className="back-button-circle" onClick={() => navigate("/")} title="Back to Documents">
+            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="15 18 9 12 15 6" />
+            </svg>
+          </button>
+          <input
+            className="title-input"
+            value={title}
+            onChange={handleTitleChange}
+            onBlur={handleTitleBlur}
+            disabled={readOnly}
+            title={readOnly ? "View only" : "Rename document"}
+          />
+        </div>
         <div className="top-bar-actions">
           <div className="save-state-wrapper">
             <span className={`save-status-dot ${readOnly ? "readonly" : saveState}`} />
@@ -262,23 +308,13 @@ export default function Editor() {
       {!readOnly && (
         <div className="toolbar">
           <ToolbarButton title="Bold (Ctrl+B)" onClick={() => exec("bold")}>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z" />
-              <path d="M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z" />
-            </svg>
+            <span style={{ fontFamily: "var(--font-sans)", fontWeight: "bold", fontSize: "16px", color: "var(--text-main)" }}>B</span>
           </ToolbarButton>
           <ToolbarButton title="Italic (Ctrl+I)" onClick={() => exec("italic")}>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="19" y1="4" x2="10" y2="4" />
-              <line x1="14" y1="20" x2="5" y2="20" />
-              <line x1="15" y1="4" x2="9" y2="20" />
-            </svg>
+            <span style={{ fontFamily: "var(--font-sans)", fontStyle: "italic", fontWeight: "600", fontSize: "16px", color: "var(--text-main)" }}>I</span>
           </ToolbarButton>
           <ToolbarButton title="Underline (Ctrl+U)" onClick={() => exec("underline")}>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M6 3v7a6 6 0 0 0 6 6 6 6 0 0 0 6-6V3" />
-              <line x1="4" y1="21" x2="20" y2="21" />
-            </svg>
+            <span style={{ fontFamily: "var(--font-sans)", textDecoration: "underline", fontWeight: "600", fontSize: "16px", color: "var(--text-main)" }}>U</span>
           </ToolbarButton>
           <ToolbarButton title="Strikethrough" onClick={() => exec("strikeThrough")}>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -290,10 +326,10 @@ export default function Editor() {
           <span className="toolbar-divider" />
           
           <ToolbarButton title="Heading 1" onClick={() => exec("formatBlock", "H1")}>
-            <strong style={{ fontSize: "14px", fontFamily: "var(--font-serif)" }}>H1</strong>
+            <strong style={{ fontSize: "14px", fontFamily: "var(--font-sans)" }}>H1</strong>
           </ToolbarButton>
           <ToolbarButton title="Heading 2" onClick={() => exec("formatBlock", "H2")}>
-            <strong style={{ fontSize: "13px", fontFamily: "var(--font-serif)" }}>H2</strong>
+            <strong style={{ fontSize: "13px", fontFamily: "var(--font-sans)" }}>H2</strong>
           </ToolbarButton>
           <ToolbarButton title="Paragraph" onClick={() => exec("formatBlock", "P")}>
             <span style={{ fontSize: "15px", fontWeight: "bold" }}>¶</span>
@@ -364,8 +400,11 @@ export default function Editor() {
             onChange={handleFontChange}
             title="Switch Editor Font"
           >
-            <option value="serif">Literary Serif</option>
-            <option value="sans">Clean Sans</option>
+            <option value="'Open Sans', sans-serif">Open Sans (Default)</option>
+            <option value="Lora, serif">Lora (Serif)</option>
+            <option value="Merriweather, serif">Merriweather (Serif)</option>
+            <option value="'Roboto Mono', monospace">Roboto Mono (Monospace)</option>
+            <option value="Georgia, serif">Georgia</option>
           </select>
 
           {/* Export Select */}
@@ -401,8 +440,9 @@ export default function Editor() {
       <main className="editor-page">
         <div className="editor-container">
           <div
-            ref={editorRef}
-            className={`editor-surface font-${fontFamily} ${readOnly ? "read-only" : ""}`}
+            ref={setEditorRef}
+            className={`editor-surface ${readOnly ? "read-only" : ""}`}
+            style={{ fontFamily: fontFamily }}
             contentEditable={!readOnly}
             suppressContentEditableWarning
             onInput={handleContentInput}
@@ -422,7 +462,7 @@ export default function Editor() {
                 </span>
               </div>
               <div>
-                <span>Ajaia Scribe Editor v1.2</span>
+                <span>Scribe Editor v1.2</span>
               </div>
             </div>
           )}

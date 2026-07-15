@@ -24,7 +24,7 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 4000;
 if (require.main === module) {
-  app.listen(PORT, () => console.log(`ajaiascribe backend listening on :${PORT}`));
+  app.listen(PORT, () => console.log(`scribe backend listening on :${PORT}`));
 }
 
 module.exports = app;

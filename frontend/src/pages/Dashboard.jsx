@@ -4,35 +4,20 @@ import { useAuth } from "../App.jsx";
 import { api } from "../api.js";
 import ShareModal from "../components/ShareModal.jsx";
 
-const QuillLogo = () => (
+const ScribeLogo = () => (
   <svg
-    viewBox="0 0 64 64"
+    xmlns="http://www.w3.org/2000/svg"
+    aria-hidden="true"
+    role="img"
     className="brand-mark-svg"
-    strokeWidth="4.5"
-    stroke="currentColor"
-    fill="none"
-    strokeLinecap="round"
-    strokeLinejoin="round"
+    viewBox="0 0 36 36"
     style={{ color: "var(--accent)", width: "36px", height: "36px" }}
   >
-    {/* Left loop leaf */}
-    <path d="M12 46c-7 0-5-16 1-20c6-4 10 10 2 10c-6 0-8 12 10 14" />
-    
-    {/* Right sprig stem */}
-    <path d="M38 50c1-8 4-18 5-26" />
-    
-    {/* Top lobe */}
-    <path d="M43 24c-2-8 6-8 6 0c0 4-4 6-6 6" />
-    
-    {/* Left lobes */}
-    <path d="M42 30c-6-4-6 4 0 6" />
-    <path d="M41 38c-6-4-6 4 0 6" />
-    <path d="M40 46c-6-4-6 4 0 6" />
-    
-    {/* Right lobes */}
-    <path d="M43 27c6-4 6 4 0 6" />
-    <path d="M42 35c6-4 6 4 0 6" />
-    <path d="M41 43c6-4 6 4 0 6" />
+    <path
+      fill="currentColor"
+      d="M17 33.9c-3.9 0-7.9-1.5-10.5-4.5c-.9.7-2 1.3-3.1 1.8c-.5.2-1.1 0-1.3-.5s0-1.1.5-1.3q1.5-.6 2.7-1.5c-1.2-1.9-1.9-4.3-1.9-7.1c0-5.3 2.5-8.1 4.8-8.1c1.5 0 3.2 1.2 3.2 4.7c0 4.7-1.1 8.2-3.5 10.8c2.2 2.6 5.6 3.9 9 3.9c.6 0 1 .4 1 1s-.3.8-.9.8M8.2 14.6c-1 0-2.8 1.8-2.8 6.1c0 2.2.5 4.1 1.4 5.6c1.8-2.1 2.7-5.1 2.7-9.1c0-1.5-.5-2.6-1.3-2.6m25.1-9.8c-.8-1.4-2.1-2.4-3.6-2.8c-.5-.1-1.1.2-1.2.7l-.9 3.4L26 3.3c-.1-.2-.4-.4-.7-.5s-.6 0-.8.2c-1.1.8-1.8 1.9-2.2 3.2l-4.2 15.4c-.4 1.5-.2 3.2.6 4.6c.6 1.1 1.6 1.9 2.7 2.5l-1.1 4c-.1.5.2 1.1.7 1.2h.3c.4 0 .8-.3 1-.7l1.1-3.9h.6c1 0 2-.3 3-.8c1.4-.8 2.4-2.1 2.8-3.6l1.6-5.8l1.6-5.8c.1-.4 0-.8-.4-1.1c-.3-.2-.8-.3-1.1-.1l-4 2.3l.6-2.1l5.7-3.2c.3-.2.5-.5.5-.8c-.1-1.2-.4-2.4-1-3.5m-9.1 2c.1-.5.3-.9.6-1.3l1.9 3.4l-1.4 5.1l-2.1-3.7zm-3.8 18.4c-.5-.9-.7-2-.4-3l2.5-9.2l2.1 3.7l-1.4 5.3l-1.3 4.7q-.9-.45-1.5-1.5m7.3-.9c-.3 1-.9 1.9-1.9 2.4c-.6.4-1.3.5-2 .5L25 23l3.7-2.1zm2.6-9.2l-.8 3.1l-3.7 2.1l.8-3.1zm-1.7-5.5l.1-.4c.1-.1.1-.3.1-.4L30 4.3c.6.3 1.1.9 1.5 1.5c.3.6.5 1.2.5 1.8z"
+    />
+    <path fill="none" d="M0 0h36v36H0z" />
   </svg>
 );
 
@@ -105,6 +90,13 @@ export default function Dashboard() {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterTab, setFilterTab] = useState("all");
   const [sortBy, setSortBy] = useState("updated-desc");
+  const [activeMenuDocId, setActiveMenuDocId] = useState(null);
+
+  useEffect(() => {
+    const closeMenu = () => setActiveMenuDocId(null);
+    window.addEventListener("click", closeMenu);
+    return () => window.removeEventListener("click", closeMenu);
+  }, []);
 
   const fileInputRef = useRef(null);
 
@@ -192,8 +184,8 @@ export default function Dashboard() {
     <div className="app-shell">
       <header className="top-bar">
         <div className="brand">
-          <QuillLogo />
-          <span className="brand-name">Ajaia Scribe</span>
+          <ScribeLogo />
+          <span className="brand-name">Scribe</span>
         </div>
         <div className="top-bar-actions">
           <span className="current-user">Signed in as <strong>{currentUser.name}</strong></span>
@@ -304,23 +296,58 @@ export default function Dashboard() {
               <div className="doc-grid">
                 {filteredOwned.map((doc) => (
                   <div className="doc-card" key={doc.id}>
-                    <button className="doc-card-main" onClick={() => navigate(`/documents/${doc.id}`)}>
-                      <div className="doc-title-wrapper">
-                        <DocumentIcon />
-                        <span className="doc-title" title={doc.title}>{doc.title}</span>
+                    <div className="doc-card-preview-area" onClick={() => navigate(`/documents/${doc.id}`)}>
+                      <div className="doc-preview-sheet">
+                        <div 
+                          className="doc-preview-content" 
+                          dangerouslySetInnerHTML={{ __html: doc.content || "<p class='empty-doc'>Empty document</p>" }}
+                        />
+                        <div className="doc-preview-fade" />
                       </div>
-                      <span className="doc-meta">Edited {timeAgo(doc.updatedAt)}</span>
-                    </button>
-                    <div className="doc-card-actions">
-                      <button className="link-button" onClick={() => setShareTarget(doc)}>
-                        Share
-                      </button>
-                      <button className="link-button" onClick={() => handleRename(doc)}>
-                        Rename
-                      </button>
-                      <button className="link-button danger" onClick={() => handleDelete(doc)}>
-                        Delete
-                      </button>
+                    </div>
+                    
+                    <div className="doc-card-footer">
+                      <div className="doc-card-info" onClick={() => navigate(`/documents/${doc.id}`)}>
+                        <span className="doc-title" title={doc.title}>{doc.title}</span>
+                        <div className="doc-card-subinfo">
+                          <svg viewBox="0 0 36 36" className="doc-scribe-icon" fill="currentColor">
+                            <path d="M17 33.9c-3.9 0-7.9-1.5-10.5-4.5c-.9.7-2 1.3-3.1 1.8c-.5.2-1.1 0-1.3-.5s0-1.1.5-1.3q1.5-.6 2.7-1.5c-1.2-1.9-1.9-4.3-1.9-7.1c0-5.3 2.5-8.1 4.8-8.1c1.5 0 3.2 1.2 3.2 4.7c0 4.7-1.1 8.2-3.5 10.8c2.2 2.6 5.6 3.9 9 3.9c.6 0 1 .4 1 1s-.3.8-.9.8M8.2 14.6c-1 0-2.8 1.8-2.8 6.1c0 2.2.5 4.1 1.4 5.6c1.8-2.1 2.7-5.1 2.7-9.1c0-1.5-.5-2.6-1.3-2.6m25.1-9.8c-.8-1.4-2.1-2.4-3.6-2.8c-.5-.1-1.1.2-1.2.7l-.9 3.4L26 3.3c-.1-.2-.4-.4-.7-.5s-.6 0-.8.2c-1.1.8-1.8 1.9-2.2 3.2l-4.2 15.4c-.4 1.5-.2 3.2.6 4.6c.6 1.1 1.6 1.9 2.7 2.5l-1.1 4c-.1.5.2 1.1.7 1.2h.3c.4 0 .8-.3 1-.7l1.1-3.9h.6c1 0 2-.3 3-.8c1.4-.8 2.4-2.1 2.8-3.6l1.6-5.8l1.6-5.8c.1-.4 0-.8-.4-1.1c-.3-.2-.8-.3-1.1-.1l-4 2.3l.6-2.1l5.7-3.2c.3-.2.5-.5.5-.8c-.1-1.2-.4-2.4-1-3.5m-9.1 2c.1-.5.3-.9.6-1.3l1.9 3.4l-1.4 5.1l-2.1-3.7zm-3.8 18.4c-.5-.9-.7-2-.4-3l2.5-9.2l2.1 3.7l-1.4 5.3l-1.3 4.7q-.9-.45-1.5-1.5m7.3-.9c-.3 1-.9 1.9-1.9 2.4c-.6.4-1.3.5-2 .5L25 23l3.7-2.1zm2.6-9.2l-.8 3.1l-3.7 2.1l.8-3.1zm-1.7-5.5l.1-.4c.1-.1.1-.3.1-.4L30 4.3c.6.3 1.1.9 1.5 1.5c.3.6.5 1.2.5 1.8z"/>
+                          </svg>
+                          <span className="doc-date">Edited {timeAgo(doc.updatedAt)}</span>
+                        </div>
+                      </div>
+                      
+                      <div className="doc-menu-wrapper">
+                        <button 
+                          className="doc-menu-btn" 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setActiveMenuDocId(activeMenuDocId === doc.id ? null : doc.id);
+                          }}
+                          title="Document options"
+                        >
+                          <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" strokeWidth="2.5" fill="none">
+                            <circle cx="12" cy="5" r="1.5" fill="currentColor"/>
+                            <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
+                            <circle cx="12" cy="19" r="1.5" fill="currentColor"/>
+                          </svg>
+                        </button>
+                        {activeMenuDocId === doc.id && (
+                          <div className="doc-dropdown-menu" onClick={(e) => e.stopPropagation()}>
+                            <button onClick={() => { handleRename(doc); setActiveMenuDocId(null); }}>
+                              Rename
+                            </button>
+                            {doc.isOwner && (
+                              <button onClick={() => { setShareTarget(doc); setActiveMenuDocId(null); }}>
+                                Share
+                              </button>
+                            )}
+                            <button className="danger" onClick={() => { handleDelete(doc); setActiveMenuDocId(null); }}>
+                              Delete
+                            </button>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -345,16 +372,57 @@ export default function Dashboard() {
               <div className="doc-grid">
                 {filteredShared.map((doc) => (
                   <div className="doc-card" key={doc.id}>
-                    <button className="doc-card-main" onClick={() => navigate(`/documents/${doc.id}`)}>
-                      <div className="doc-title-wrapper">
-                        <DocumentIcon />
-                        <span className="doc-title" title={doc.title}>{doc.title}</span>
+                    <div className="doc-card-preview-area" onClick={() => navigate(`/documents/${doc.id}`)}>
+                      <div className="doc-preview-sheet">
+                        <div 
+                          className="doc-preview-content" 
+                          dangerouslySetInnerHTML={{ __html: doc.content || "<p class='empty-doc'>Empty document</p>" }}
+                        />
+                        <div className="doc-preview-fade" />
                       </div>
-                      <span className="doc-meta">
-                        Owned by {doc.ownerName} · {doc.permission === "view" ? "view only" : "can edit"}
-                      </span>
-                    </button>
-                    <span className="badge">Shared</span>
+                    </div>
+                    
+                    <div className="doc-card-footer">
+                      <div className="doc-card-info" onClick={() => navigate(`/documents/${doc.id}`)}>
+                        <span className="doc-title" title={doc.title}>{doc.title}</span>
+                        <div className="doc-card-subinfo">
+                          <svg viewBox="0 0 36 36" className="doc-scribe-icon" fill="currentColor">
+                            <path d="M17 33.9c-3.9 0-7.9-1.5-10.5-4.5c-.9.7-2 1.3-3.1 1.8c-.5.2-1.1 0-1.3-.5s0-1.1.5-1.3q1.5-.6 2.7-1.5c-1.2-1.9-1.9-4.3-1.9-7.1c0-5.3 2.5-8.1 4.8-8.1c1.5 0 3.2 1.2 3.2 4.7c0 4.7-1.1 8.2-3.5 10.8c2.2 2.6 5.6 3.9 9 3.9c.6 0 1 .4 1 1s-.3.8-.9.8M8.2 14.6c-1 0-2.8 1.8-2.8 6.1c0 2.2.5 4.1 1.4 5.6c1.8-2.1 2.7-5.1 2.7-9.1c0-1.5-.5-2.6-1.3-2.6m25.1-9.8c-.8-1.4-2.1-2.4-3.6-2.8c-.5-.1-1.1.2-1.2.7l-.9 3.4L26 3.3c-.1-.2-.4-.4-.7-.5s-.6 0-.8.2c-1.1.8-1.8 1.9-2.2 3.2l-4.2 15.4c-.4 1.5-.2 3.2.6 4.6c.6 1.1 1.6 1.9 2.7 2.5l-1.1 4c-.1.5.2 1.1.7 1.2h.3c.4 0 .8-.3 1-.7l1.1-3.9h.6c1 0 2-.3 3-.8c1.4-.8 2.4-2.1 2.8-3.6l1.6-5.8l1.6-5.8c.1-.4 0-.8-.4-1.1c-.3-.2-.8-.3-1.1-.1l-4 2.3l.6-2.1l5.7-3.2c.3-.2.5-.5.5-.8c-.1-1.2-.4-2.4-1-3.5m-9.1 2c.1-.5.3-.9.6-1.3l1.9 3.4l-1.4 5.1l-2.1-3.7zm-3.8 18.4c-.5-.9-.7-2-.4-3l2.5-9.2l2.1 3.7l-1.4 5.3l-1.3 4.7q-.9-.45-1.5-1.5m7.3-.9c-.3 1-.9 1.9-1.9 2.4c-.6.4-1.3.5-2 .5L25 23l3.7-2.1zm2.6-9.2l-.8 3.1l-3.7 2.1l.8-3.1zm-1.7-5.5l.1-.4c.1-.1.1-.3.1-.4L30 4.3c.6.3 1.1.9 1.5 1.5c.3.6.5 1.2.5 1.8z"/>
+                          </svg>
+                          <span className="doc-date" title={`Owned by ${doc.ownerName}`}>
+                            Owned by {doc.ownerName.split(" ")[0]}
+                          </span>
+                        </div>
+                      </div>
+                      
+                      {doc.permission === "edit" ? (
+                        <div className="doc-menu-wrapper">
+                          <button 
+                            className="doc-menu-btn" 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setActiveMenuDocId(activeMenuDocId === doc.id ? null : doc.id);
+                            }}
+                            title="Document options"
+                          >
+                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" strokeWidth="2.5" fill="none">
+                              <circle cx="12" cy="5" r="1.5" fill="currentColor"/>
+                              <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
+                              <circle cx="12" cy="19" r="1.5" fill="currentColor"/>
+                            </svg>
+                          </button>
+                          {activeMenuDocId === doc.id && (
+                            <div className="doc-dropdown-menu" onClick={(e) => e.stopPropagation()}>
+                              <button onClick={() => { handleRename(doc); setActiveMenuDocId(null); }}>
+                                Rename
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="badge" style={{ fontSize: "10px", padding: "3px 6px" }}>View</span>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>

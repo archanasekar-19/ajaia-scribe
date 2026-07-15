@@ -36,7 +36,7 @@ set of docs.
 - **Test isolation.** An early version of the test file referenced a
   database path that `db.js` didn't actually respect, which would have
   made "isolated" tests silently share state with local dev data. I fixed
-  `db.js` to honor a `AJAIASCRIBE_DATA_DIR` override and removed the dead code
+  `db.js` to honor a `SCRIBE_DATA_DIR` override and removed the dead code
   path once it was actually isolated.
 - **`npm test` script.** The initial `node --test tests/` invocation
   doesn't reliably discover test files in this Node version — I caught

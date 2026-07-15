@@ -9,7 +9,7 @@ const fs = require("fs");
 
 // Point the app at an isolated test database before requiring anything else.
 const TEST_DB_DIR = path.join(__dirname, "..", "data-test");
-process.env.AJAIASCRIBE_DATA_DIR = TEST_DB_DIR;
+process.env.SCRIBE_DATA_DIR = TEST_DB_DIR;
 if (fs.existsSync(TEST_DB_DIR)) fs.rmSync(TEST_DB_DIR, { recursive: true, force: true });
 
 const request = require("http");

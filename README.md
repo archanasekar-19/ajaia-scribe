@@ -1,8 +1,8 @@
-# Ajaia Scribe — a lightweight collaborative document editor
+# Scribe — a lightweight collaborative document editor
 
 Built for the Ajaia LLC Full Stack Product Engineer take-home.
 
-Ajaia Scribe lets a small team create, edit, import, and share rich-text documents.
+Scribe lets a small team create, edit, import, and share rich-text documents.
 It's deliberately scoped: no real-time co-editing, no granular permission
 tiers beyond edit/view, no rich media embeds. See `ARCHITECTURE.md` for the
 reasoning behind those cuts.
@@ -45,7 +45,7 @@ reasoning behind those cuts.
 ## Project structure
 
 ```
-ajaiascribe/
+scribe/
   backend/          Express API + SQLite
     routes/          auth, documents, upload
     tests/           automated API tests
@@ -70,7 +70,7 @@ npm install
 npm run dev        # starts on http://localhost:4000
 ```
 
-The SQLite file is created automatically at `backend/data/ajaiascribe.sqlite`
+The SQLite file is created automatically at `backend/data/scribe.sqlite`
 on first run, seeded with 3 demo users (see below).
 
 ### 2. Frontend

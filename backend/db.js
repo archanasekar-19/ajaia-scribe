@@ -1,17 +1,11 @@
-// db.js
-// Sets up a SQLite database (file-based, persists across restarts) and seeds
-// a handful of demo users so reviewers can test sharing without building an
-// auth system. This is intentionally simple: no passwords, no sessions.
-// See AI_WORKFLOW.md / ARCHITECTURE.md for the reasoning behind this cut.
-
 const path = require("path");
 const fs = require("fs");
 const Database = require("better-sqlite3");
 
-const DATA_DIR = process.env.AJAIASCRIBE_DATA_DIR || path.join(__dirname, "data");
+const DATA_DIR = process.env.SCRIBE_DATA_DIR || path.join(__dirname, "data");
 if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
 
-const db = new Database(path.join(DATA_DIR, "ajaiascribe.sqlite"));
+const db = new Database(path.join(DATA_DIR, "scribe.sqlite"));
 db.pragma("journal_mode = WAL");
 db.pragma("foreign_keys = ON");
 

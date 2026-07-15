@@ -8,7 +8,7 @@ import { api } from "./api.js";
 export const AuthContext = createContext(null);
 export const useAuth = () => useContext(AuthContext);
 
-const STORAGE_KEY = "ajaiascribe.currentUserId";
+const STORAGE_KEY = "scribe.currentUserId";
 
 function AuthProvider({ children }) {
   const [users, setUsers] = useState([]);

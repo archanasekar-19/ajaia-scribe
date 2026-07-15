@@ -2,8 +2,29 @@ import React, { useEffect, useState } from "react";
 import { api } from "../api.js";
 import { useAuth } from "../App.jsx";
 
+function TestAccountRow({ user }) {
+  const [copied, setCopied] = useState(false);
+  const handleCopy = () => {
+    navigator.clipboard.writeText(user.email);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1200);
+  };
+  return (
+    <div className="test-account-row">
+      <span className="test-account-email">{user.email}</span>
+      <button
+        type="button"
+        className={`copy-badge-btn ${copied ? "copied" : ""}`}
+        onClick={handleCopy}
+      >
+        {copied ? "Copied!" : "Copy"}
+      </button>
+    </div>
+  );
+}
+
 export default function ShareModal({ doc, onClose }) {
-  const { currentUser } = useAuth();
+  const { currentUser, users } = useAuth();
   const [shares, setShares] = useState([]);
   const [email, setEmail] = useState("");
   const [permission, setPermission] = useState("edit");
@@ -19,7 +40,6 @@ export default function ShareModal({ doc, onClose }) {
 
   useEffect(() => {
     loadShares();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [doc.id]);
 
   const handleShare = async (e) => {
@@ -90,9 +110,16 @@ export default function ShareModal({ doc, onClose }) {
           ))}
         </div>
 
-        <p className="hint">
-          Test accounts for sharing: archana@example.com, priya@example.com, dev@example.com
-        </p>
+        <div className="test-accounts-section">
+          <h3>Test accounts to share with</h3>
+          <div className="test-accounts-grid">
+            {users
+              .filter((u) => u.id !== currentUser.id)
+              .map((u) => (
+                <TestAccountRow key={u.id} user={u} />
+              ))}
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -74,7 +74,5 @@ document format (no versioning, no diffing, no plain-text export yet).
    images).
 2. Optimistic UI + conflict warning on the editor (detect if the document
    changed since it was loaded, before overwriting on save).
-3. Markdown/PDF export, since the data is already HTML and it's a natural
-   stretch from the import path.
-4. A real auth layer (even a simple email+magic-link flow) so the sharing
+3. A real auth layer (even a simple email+magic-link flow) so the sharing
    model isn't trivially bypassable.
