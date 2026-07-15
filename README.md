@@ -103,6 +103,14 @@ one user, share a document with a second user's email, then switch accounts
 | Priya Raman | priya@example.com |
 | Dev Kumar | dev@example.com |
 
+## Live Deployment
+
+The application is deployed and active:
+- **Live Website**: [https://scribe-docs-editor.netlify.app/](https://scribe-docs-editor.netlify.app/)
+- **Backend API**: Deployed on Render Web Services (Free Tier)
+
+For step-by-step instructions on persistent volumes, local tunnels, or configuring environment variables, refer to the [Deployment Guide](deploy_guide.md).
+
 ## Production build
 
 ```bash
