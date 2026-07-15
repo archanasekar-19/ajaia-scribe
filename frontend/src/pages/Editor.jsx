@@ -70,7 +70,14 @@ export default function Editor() {
   const [error, setError] = useState(null);
   const [saveState, setSaveState] = useState("idle"); // idle | saving | saved | error
   const [showShare, setShowShare] = useState(false);
-  
+
+  const titleRef = useRef("");
+
+  // Sync titleRef with state
+  useEffect(() => {
+    titleRef.current = title;
+  }, [title]);
+
   // Custom states
   const savedFont = localStorage.getItem("editor-font");
   const defaultFont = savedFont && (savedFont.includes(",") || savedFont.includes(" ")) ? savedFont : "'Open Sans', sans-serif";
@@ -119,14 +126,28 @@ export default function Editor() {
     }
   }, [doc]);
 
-  // Save immediately on unmount if timer is active
+  // Save immediately on unmount if any edits exist
   useEffect(() => {
     return () => {
-      if (saveTimer.current) {
-        clearTimeout(saveTimer.current);
-        if (editorRef.current && doc && doc.permission !== "view") {
-          const content = editorRef.current.innerHTML;
-          api.updateDocument(id, currentUser.id, { content }).catch(() => {});
+      if (saveTimer.current) clearTimeout(saveTimer.current);
+
+      if (doc && doc.permission !== "view") {
+        const patch = {};
+        let hasChanges = false;
+
+        if (editorRef.current) {
+          patch.content = editorRef.current.innerHTML;
+          hasChanges = true;
+        }
+
+        const trimmedTitle = titleRef.current.trim();
+        if (trimmedTitle && trimmedTitle !== doc.title) {
+          patch.title = trimmedTitle;
+          hasChanges = true;
+        }
+
+        if (hasChanges) {
+          api.updateDocument(id, currentUser.id, patch).catch(() => {});
         }
       }
     };
@@ -190,6 +211,12 @@ export default function Editor() {
     } catch (err) {
       setError(err.message);
       setTitle(doc.title);
+    }
+  };
+
+  const handleTitleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      e.target.blur();
     }
   };
 
@@ -285,6 +312,7 @@ export default function Editor() {
             value={title}
             onChange={handleTitleChange}
             onBlur={handleTitleBlur}
+            onKeyDown={handleTitleKeyDown}
             disabled={readOnly}
             title={readOnly ? "View only" : "Rename document"}
           />
