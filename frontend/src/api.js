@@ -1,7 +1,9 @@
 // api.js - thin fetch wrapper. Attaches the mocked x-user-id header from
 // whatever user is currently "logged in" (see AuthContext in App.jsx).
 
-const BASE = "/api";
+const BASE = import.meta.env.VITE_BACKEND_URL
+  ? import.meta.env.VITE_BACKEND_URL.replace(/\/$/, "") + "/api"
+  : "/api";
 
 async function request(path, { method = "GET", body, userId, isForm = false } = {}) {
   const headers = {};
