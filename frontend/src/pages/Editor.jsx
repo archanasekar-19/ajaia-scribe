@@ -71,6 +71,13 @@ export default function Editor() {
   const [saveState, setSaveState] = useState("idle"); // idle | saving | saved | error
   const [showShare, setShowShare] = useState(false);
 
+  // Custom states
+  const savedFont = localStorage.getItem("editor-font");
+  const defaultFont = savedFont && (savedFont.includes(",") || savedFont.includes(" ")) ? savedFont : "'Open Sans', sans-serif";
+  const [fontFamily, setFontFamily] = useState(defaultFont);
+  const [zenMode, setZenMode] = useState(false);
+  const [stats, setStats] = useState({ words: 0, chars: 0, readTime: 0 });
+
   const titleRef = useRef("");
   const fontFamilyRef = useRef("");
 
@@ -82,13 +89,6 @@ export default function Editor() {
   useEffect(() => {
     fontFamilyRef.current = fontFamily;
   }, [fontFamily]);
-
-  // Custom states
-  const savedFont = localStorage.getItem("editor-font");
-  const defaultFont = savedFont && (savedFont.includes(",") || savedFont.includes(" ")) ? savedFont : "'Open Sans', sans-serif";
-  const [fontFamily, setFontFamily] = useState(defaultFont);
-  const [zenMode, setZenMode] = useState(false);
-  const [stats, setStats] = useState({ words: 0, chars: 0, readTime: 0 });
 
   // Update statistics
   const updateStats = () => {
